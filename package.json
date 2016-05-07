@@ -1,0 +1,14 @@
+{
+  "name": "all-equal",
+  "version": "0.1.0",
+  "description": "Proyecto: Todos parejos",
+  "main": "index.js",
+  "repository": "",
+  "author": "Jorge Raul Ramirez Nieves <jorgeraul.rn@gmail.com>",
+  "dependencies": {
+    "express": "^4.13.4",
+    "fs": "0.0.2",
+    "mongoose": "^4.4.15",
+    "path": "^0.12.7"
+  }
+}
