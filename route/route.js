@@ -1,5 +1,9 @@
 var mongoose = require('mongoose');
 var user_schema = require('../model/user_schema');
+var food_dish_schema = require('../model/food_dish_schema');
+var food_dish_model = require('../model/food_dish');
+
+var message_res = require('../lib/message_res');
 
 exports.index = function (req, res)
 {
@@ -15,22 +19,17 @@ exports.registerUser = function (req, res)
 {
 	var User = mongoose.model('user', user_schema.userSchema);
 	
-	User.findOne({user: req.query.user}, function (err, userObj) 
+	User.findOne({user: req.query.email}, function (err, userObj) 
 	{
 		if (err) 
 		{
 			console.log(err);
-			
-			res.writeHead(200, {"Content-Type": "text/json"});
-			res.write(JSON.stringify('FIND ERROR'));
-			res.end();
+			message_res.res(res, 'FIND ERROR');
 		} 
 		else if (userObj) 
 		{
 			console.log('Found:', userObj);
-			res.writeHead(200, {"Content-Type": "text/json"});
-			res.write(JSON.stringify('USER EXIST'));
-			res.end();
+			message_res.res(res, 'USER EXIST');
 		} 
 		else 
 		{
@@ -38,7 +37,7 @@ exports.registerUser = function (req, res)
 			
 			var user_add = new User();
 			user_add.nick = req.query.nick;
-			user_add.user = req.query.user;
+			user_add.email = req.query.email;
 			user_add.password = req.query.password;
 			user_add.isCard = req.query.isCard;
 			if (user_add.isCard == true)
@@ -51,20 +50,90 @@ exports.registerUser = function (req, res)
 				if (err) 
 				{
 					console.log(err);
-					
-					res.writeHead(200, {"Content-Type": "text/json"});
-					res.write(JSON.stringify('SAVE ERROR'));
-					res.end();
+					message_res.res(res, 'SAVE ERROR');
 				} 
 				else 
 				{
 					console.log('saved successfully:', userObj);
-			
-					res.writeHead(200, {"Content-Type": "text/json"});
-					res.write(JSON.stringify('SUCCESS'));
-					res.end();
+					message_res.res(res, 'SUCCESS');
 				}
 			});
 		}
+	});
+}
+
+exports.getAllUsers = function (req, res)
+{
+	var User = mongoose.model('user', user_schema.userSchema);
+	User.find({}, function(err, users) 
+	{
+		var userMap = {};
+		var userArray = [];
+
+		users.forEach(function(user) 
+		{
+// 			userMap[user._id] = user.user;
+			userArray.push(user.email);
+		});
+
+		message_res.res(res, userArray);  
+	});
+}
+
+exports.addFoodDish = function (req, res)
+{
+	var FoodDish = mongoose.model('foodDish', food_dish_schema.foodDishSchema);
+	
+	FoodDish.findOne({name: req.query.name}, function (err, userObj) 
+	{
+		if (err) 
+		{
+			console.log(err);
+			message_res.res(res, 'FIND ERROR');
+		} 
+		else if (userObj) 
+		{
+			console.log('Found:', userObj);
+			message_res.res(res, 'FOOD DISH EXIST');
+		} 
+		else 
+		{
+			console.log('Food Dish registered');
+			
+			var food_dish_add = new FoodDish();
+			food_dish_add.name = req.query.name;
+			food_dish_add.cost = req.query.cost;
+			
+			food_dish_add.save(function (err, userObj) 
+			{
+				if (err) 
+				{
+					console.log(err);
+					message_res.res(res, 'SAVE ERROR');
+				} 
+				else 
+				{
+					console.log('saved successfully:', userObj);
+					message_res.res(res, 'SUCCESS');
+				}
+			});
+		}
+	});
+}
+
+exports.getAllFoodDish = function (req, res)
+{
+	var FoodDish = mongoose.model('foodDish', food_dish_schema.foodDishSchema);
+	
+	FoodDish.find({}, function(err, foodDishes) 
+	{
+		var foodDishArray = [];
+
+		foodDishes.forEach(function(foodDish)
+		{
+			foodDishArray.push(new food_dish_model.foodDish(foodDish.name, foodDish.cost));
+		});
+
+		message_res.res(res, foodDishArray);  
 	});
 }

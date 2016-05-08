@@ -27,6 +27,21 @@ function initializate ()
 		route.registerUser(req, res);
 	});
 	
+	app.get('/getAllUsers', function(req, res)
+	{
+		route.getAllUsers(req, res);
+	})
+	
+	app.get('/addFoodDish', function(req, res)
+	{
+		route.addFoodDish(req, res);
+	})
+	
+	app.get('/getAllFoodDish', function (req, res)
+	{
+		route.getAllFoodDish(req, res);
+	})
+	
 	app.listen(1818, function() 
 	{
 		console.log("Node server running on http://localhost:1818");
