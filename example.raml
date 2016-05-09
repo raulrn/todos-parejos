@@ -1,0 +1,331 @@
+#%RAML 0.8
+title: Todos Parejos
+version: 1
+baseUri: http://todosparejos.com/{version}
+documentation:
+  - title: Bienvenidos
+    content: |
+      Bienvenidos a la documentación de la API todosparejos.
+
+  - title: Descripción
+    content: |
+      Si tienes un negocio de comida y deseas automatizar el pedido de platillos y el cobro de la cuenta a tus clientes, esta API te ayudará.
+      Te permite el registro de comensales una sola vez. Este registro incluye la tarjeta de crédito del cliente, si es que cuenta con ella, para realizar los cobros de manera automática.
+      Te permite gestionar el préstamo de dinero para pago de cuenta de los clientes que no cuenten con tarjeta de crédito.
+      Realiza el cobro de todo lo consumido una vez establecidos los prestamos.
+      Mantiene una lista de platillos y precios para un manejo automático de consumos individuales.
+
+securitySchemes:
+  - Unauthenticated: !include unauthenticated.raml
+  - oauth_1_0:
+      description: OAuth 1.0 continues to be supported for all API requests, but OAuth 2.0 is now preferred.
+      type: OAuth 1.0
+      settings:
+        requestTokenUri: https://api.dropbox.com/1/oauth/request_token
+        authorizationUri: https://www.dropbox.com/1/oauth/authorize
+        tokenCredentialsUri: https://api.dropbox.com/1/oauth/access_token
+
+traits:
+  - paged:
+      queryParameters:
+        page_size:
+          description: The number of items per page
+          type: number
+          default: 20
+        page:
+          description: The page to return
+          type: number
+          default: 0
+      headers:
+        TESTING:
+          type: string
+          description: does a trait render its headers?
+
+/registerUser:
+  securedBy: [Unauthenticated]
+  displayName: USUARIOS
+
+  description: |
+    Con estos métods se realizan operaciones sobre usuarios dentro de la plataforma.
+
+  get:
+    description: |
+      Registra un nuevo usuario en la plataforma.
+
+    queryParameters:
+        email:
+          type: string
+          description: e-mail del cliente.
+          required: true
+          example: cliente@example.com
+        nick:
+          type: string
+          description: Nick del usuario que desea mostrar.
+          required: true
+          example: Cliente
+        password:
+          type: string
+          description: Password que desea ingresar el nuevo cliente.
+          required: true
+          example: **********
+		isCard:
+          type: boolean
+          description: True si cuenta con tarjeta de crédito.
+          required: true
+          example: true
+		card:
+          type: string
+          description: El número de tarjeta de crédito
+          required: true
+          example: 0123456789
+
+  /loginUser:
+    get:
+      description: Acceder a cuenta de cliente.
+      queryParameters:
+        email:
+          type: string
+          description: e-mail del cliente.
+          required: true
+          example: cliente@example.com
+        password:
+          type: string
+          description: Password que desea ingresar el nuevo cliente.
+          required: true
+          example: **********
+  /logoutUser:
+    get:
+      description: Salir de cuenta de cliente.
+      queryParameters:
+        email:
+          type: string
+          description: e-mail del cliente.
+          required: true
+          example: cliente@example.com
+          
+  /getAllUsers:
+    get:
+      description: Retorna una lista con todos los usuarios registrados.
+
+
+
+
+/createGlobalCount:
+  securedBy: [Unauthenticated]
+  displayName: CUENTAS GLOBALES
+
+  description: |
+    Con estos métodos se realizan operaciones sobre cuentas globales, es decir, la cuenta de cada grupo de amigos.
+
+  get:
+    description: |
+      Un usuario crea una cuenta global y se agrega a sí mismo en dicha cuenta.
+
+    queryParameters:
+        name:
+          type: string
+          description: Nombre de la cuenta global.
+          required: true
+          example: FondaDonaPelosLunes
+        email:
+          type: string
+          description: Usuario que abre la cuenta.
+          required: true
+          example: cliente@example.com
+  /addUserToGlobalCount:
+    get:
+      description: Agrega a un usuario a una cuenta global.
+      queryParameters:
+        name:
+          type: string
+          description: Nombre de la cuenta global.
+          required: true
+          example: FondaDonaPelosLunes
+        email:
+          type: string
+          description: Usuario que abre la cuenta.
+          required: true
+          example: cliente@example.com
+  /getMyGlobalCounts:
+    get:
+      description: Retorna una lista con todas las cuentas globales registradas.
+          
+  /getUsersOfGlobalCount:
+    get:
+      description: Retorna una lista con todos los usuarios de una cuenta global.
+      queryParameters:
+        name:
+          type: string
+          description: Nombre de la cuenta global.
+          required: true
+          example: FondaDonaPelosLunes
+
+
+          
+          
+          
+          
+/addFoodDish:
+  securedBy: [Unauthenticated]
+  displayName: PLATILLOS
+
+  description: |
+    Con estos métodos se realizan operaciones sobre los platillos que se ofertan en la fonda.
+
+  get:
+    description: |
+      Se agrega un platillo junto con su costo.
+
+    queryParameters:
+        name:
+          type: string
+          description: Nombre del platillo.
+          required: true
+          example: EnchiladasSuizas
+        cost:
+          type: numeric
+          description: Costo del platillo.
+          required: true
+          example: 50
+  /getAllFoodDish:
+    get:
+      description: Retorna una lista con todos los platillos registrados.
+  /addFoodDishToUser:
+    get:
+      description: Agrega un platillo al usuario que hara realizado la orden.
+      queryParameters:
+        name:
+          type: string
+          description: Nombre del platillo.
+          required: true
+          example: EnchiladasSuizas
+        email:
+          type: string
+          description: email del usuario que ordenó.
+          required: true
+          example: cliente@example.com
+
+          
+          
+          
+          
+       
+       
+       
+       
+       
+/payUserCount:
+  securedBy: [Unauthenticated]
+  displayName: PRESTAMOS
+
+  description: |
+    Con estos métodos se realizan operaciones sobre los prestamos de dinero a los clientes que no cuentan con tarjeta de crédito.
+
+  get:
+    description: |
+      Se establece la relación de prestamo entre dos clientes para una cuenta global.
+
+    queryParameters:
+        nameCount:
+          type: string
+          description: Nombre de la cuenta global.
+          required: true
+          example: FondaDonaPelosLunes
+        emailLender:
+          type: string
+          description: Correo del cliente que prestará dinero.
+          required: true
+          example: cliente@example.com
+        emailBorrower:
+          type: string
+          description: Correo del cliente que pide prestado.
+          required: true
+          example: cliente@example.com
+  /unpayUserCount:
+    get:
+      description: Deshace la relación de prestamo.
+      queryParameters:
+        nameCount:
+          type: string
+          description: Nombre de la cuenta global.
+          required: true
+          example: FondaDonaPelosLunes
+        emailLender:
+          type: string
+          description: Correo del cliente que prestará dinero.
+          required: true
+          example: cliente@example.com
+        emailBorrower:
+          type: string
+          description: Correo del cliente que pide prestado.
+          required: true
+          example: cliente@example.com
+  /addFoodDishToUser:
+    get:
+      description: Agrega un platillo al usuario que hara realizado la orden.
+      queryParameters:
+        name:
+          type: string
+          description: Nombre del platillo.
+          required: true
+          example: EnchiladasSuizas
+        email:
+          type: string
+          description: email del usuario que ordenó.
+          required: true
+          example: cliente@example.com
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+/agreeToPay:
+  securedBy: [Unauthenticated]
+  displayName: PAGOS
+
+  description: |
+    Con estos métodos se realizan operaciones para realizar los pagos de la cuenta.
+
+  get:
+    description: |
+      Cada cliente que integre una cuenta global deberá autorizar el pago de la misma. No importando que se le haya realizado un préstamo.
+
+    queryParameters:
+        name:
+          type: string
+          description: Nombre de la cuenta global.
+          required: true
+          example: FondaDonaPelosLunes
+        email:
+          type: string
+          description: Usuario que abre la cuenta.
+          required: true
+          example: cliente@example.com
+        password:
+		  type: string
+		  description: Password del cliente.
+          required: true
+          example: ***********
+  /collect:
+    get:
+      description: Realiza el cobro de la cuenta. Todos deben haber aceptado el pago de la misma.
+      queryParameters:
+        name:
+          type: string
+          description: Nombre de la cuenta global.
+          required: true
+          example: FondaDonaPelosLunes
+  /getDebtors:
+    get:
+      description: Retorna una lista de los usuarios que te deben y el monto del adeudo, así como de la cuenta en la que se contrajo la deuda.
+      queryParameters:
+        email:
+          type: string
+          description: email del usuario que consulta.
+          required: true
+          example: cliente@example.com
