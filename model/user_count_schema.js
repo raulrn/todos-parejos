@@ -1,8 +1,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-exports.globalCountSchema = new Schema({
-  email: {type: String, default: ''},
-  user: {type: String, default: ''},
-  amount: {type: String, default: ''},
+exports.userCountSchema = new Schema({
+	email: {type: String, default: ''},
+	name: {type: String, default: ''},
+	foodDish: {type: String, default: ''},
+	cost: {type: Number, default: 0}
 });
